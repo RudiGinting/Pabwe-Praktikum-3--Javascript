@@ -17,45 +17,19 @@
     />
     <!-- SortableJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-
-    <style>
-      .sortable-ghost {
-        opacity: 0.5;
-      }
-      .sortable-chosen {
-        background-color: #e9ecef;
-      }
-      .drag-handle {
-        cursor: grab;
-      }
-      .drag-handle:active {
-        cursor: grabbing;
-      }
-      .completed-todo {
-        text-decoration: line-through;
-        opacity: 0.7;
-      }
-      .todo-item {
-        transition: all 0.3s ease;
-      }
-      .todo-item:hover {
-        background-color: #f8f9fa !important;
-      }
-      .edit-mode {
-        background-color: #fff3cd;
-      }
-    </style>
   </head>
-  <body>
+  <body class="bg-body-secondary">
     <div class="container mt-5">
       <div class="row justify-content-center">
         <div class="col-md-8">
           <h1 class="text-center mb-4">Enhanced Todo List</h1>
 
-          <!-- Form untuk menambah todo -->
-          <div class="card mb-4">
+          <!-- Semua fitur dalam 1 Card -->
+          <div class="card shadow-sm">
             <div class="card-body">
-              <form id="todoForm">
+
+              <!-- Form untuk menambah todo -->
+              <form id="todoForm" class="mb-4">
                 <div class="mb-3">
                   <label for="todoInput" class="form-label">
                     Apa rencana kamu selanjutnya?
@@ -76,13 +50,9 @@
                   <div class="form-text text-danger" id="errorMessage" style="display: none;"></div>
                 </div>
               </form>
-            </div>
-          </div>
 
-          <!-- Filter dan Pencarian -->
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="row">
+              <!-- Filter dan Pencarian -->
+              <div class="row mb-4">
                 <div class="col-md-6">
                   <label for="filterSelect" class="form-label">Filter</label>
                   <select class="form-select" id="filterSelect">
@@ -106,22 +76,14 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-
-
-          <!-- Daftar Todo -->
-          <div class="card">
-            <div class="card-header">
-              <h5 class="mb-0">
+              <!-- Daftar Todo -->
+              <h5 class="mb-3">
                 <i class="bi bi-list-task"></i> Daftar Todo
                 <small class="text-muted">(Drag & drop untuk mengurutkan)</small>
               </h5>
-            </div>
-            <div class="card-body">
-              <ul class="list-group list-group-flush" id="todoList">
-                <li class="list-group-item text-center text-muted" id="emptyState">
+              <ul class="list-unstyled bg-light p-3 rounded shadow-sm" id="todoList">
+                <li class="text-center text-muted" id="emptyState">
                   <i class="bi bi-clipboard-x fs-1"></i>
                   <p class="mb-0">Belum ada todo. Tambahkan yang pertama!</p>
                 </li>
@@ -132,7 +94,7 @@
       </div>
     </div>
 
-    <!-- Modal untuk konfirmasi hapus -->
+    <!-- Modal Konfirmasi Hapus -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -154,16 +116,16 @@
     <!-- Bootstrap JS Local -->
     <script src="/assets/vendor/bootstrap-5.3.7/package/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Script TodoApp -->
     <script>
       class TodoApp {
         constructor() {
           this.todos = [];
-          this.currentFilter = 'all';
-          this.currentSearch = '';
+          this.currentFilter = "all";
+          this.currentSearch = "";
           this.editingId = null;
-          this.deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+          this.deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
           this.todoToDelete = null;
-          
           this.init();
         }
 
@@ -175,45 +137,36 @@
         }
 
         loadTodos() {
-          const stored = JSON.parse(localStorage.getItem('enhancedTodos') || '[]');
+          const stored = JSON.parse(localStorage.getItem("enhancedTodos") || "[]");
           this.todos = stored.map((todo, index) => ({
             ...todo,
-            id: todo.id || Date.now() + index
+            id: todo.id || Date.now() + index,
           }));
         }
 
         saveTodos() {
-          localStorage.setItem('enhancedTodos', JSON.stringify(this.todos));
+          localStorage.setItem("enhancedTodos", JSON.stringify(this.todos));
         }
 
         bindEvents() {
-          // Form submission
-          document.getElementById('todoForm').addEventListener('submit', (e) => {
+          document.getElementById("todoForm").addEventListener("submit", (e) => {
             e.preventDefault();
             this.handleSubmit();
           });
-
-          // Filter change
-          document.getElementById('filterSelect').addEventListener('change', (e) => {
+          document.getElementById("filterSelect").addEventListener("change", (e) => {
             this.currentFilter = e.target.value;
             this.render();
           });
-
-          // Search
-          document.getElementById('searchInput').addEventListener('input', (e) => {
+          document.getElementById("searchInput").addEventListener("input", (e) => {
             this.currentSearch = e.target.value;
             this.render();
           });
-
-          // Clear search
-          document.getElementById('clearSearch').addEventListener('click', () => {
-            document.getElementById('searchInput').value = '';
-            this.currentSearch = '';
+          document.getElementById("clearSearch").addEventListener("click", () => {
+            document.getElementById("searchInput").value = "";
+            this.currentSearch = "";
             this.render();
           });
-
-          // Delete confirmation
-          document.getElementById('confirmDelete').addEventListener('click', () => {
+          document.getElementById("confirmDelete").addEventListener("click", () => {
             if (this.todoToDelete !== null) {
               this.deleteTodo(this.todoToDelete);
               this.deleteModal.hide();
@@ -223,56 +176,55 @@
         }
 
         initSortable() {
-          const todoList = document.getElementById('todoList');
+          const todoList = document.getElementById("todoList");
           this.sortable = Sortable.create(todoList, {
-            handle: '.drag-handle',
-            ghostClass: 'sortable-ghost',
-            chosenClass: 'sortable-chosen',
+            animation: 150,
+            ghostClass: "opacity-50",
+            chosenClass: "bg-body-tertiary",
+            filter: ".btn, input[type='checkbox'], label",
             onEnd: (evt) => {
               if (evt.oldIndex !== evt.newIndex) {
                 this.reorderTodos(evt.oldIndex, evt.newIndex);
               }
-            }
+            },
           });
         }
 
         handleSubmit() {
-          const input = document.getElementById('todoInput');
+          const input = document.getElementById("todoInput");
           const text = input.value.trim();
-          const errorDiv = document.getElementById('errorMessage');
-
+          const errorDiv = document.getElementById("errorMessage");
           if (!text) {
-            this.showError('Todo tidak boleh kosong!');
+            this.showError("Todo tidak boleh kosong!");
             return;
           }
-
           if (this.editingId) {
             this.updateTodo(this.editingId, text);
           } else {
             if (this.isDuplicate(text)) {
-              this.showError('Todo dengan judul yang sama sudah ada!');
+              this.showError("Todo dengan judul yang sama sudah ada!");
               return;
             }
             this.addTodo(text);
           }
-
-          input.value = '';
-          errorDiv.style.display = 'none';
+          input.value = "";
+          errorDiv.style.display = "none";
         }
 
         showError(message) {
-          const errorDiv = document.getElementById('errorMessage');
+          const errorDiv = document.getElementById("errorMessage");
           errorDiv.textContent = message;
-          errorDiv.style.display = 'block';
+          errorDiv.style.display = "block";
           setTimeout(() => {
-            errorDiv.style.display = 'none';
+            errorDiv.style.display = "none";
           }, 3000);
         }
 
         isDuplicate(text) {
-          return this.todos.some(todo => 
-            todo.text.toLowerCase() === text.toLowerCase() && 
-            todo.id !== this.editingId
+          return this.todos.some(
+            (todo) =>
+              todo.text.toLowerCase() === text.toLowerCase() &&
+              todo.id !== this.editingId
           );
         }
 
@@ -281,7 +233,7 @@
             id: Date.now(),
             text: text,
             completed: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           };
           this.todos.unshift(todo);
           this.saveTodos();
@@ -289,7 +241,7 @@
         }
 
         updateTodo(id, newText) {
-          const todo = this.todos.find(t => t.id === id);
+          const todo = this.todos.find((t) => t.id === id);
           if (todo) {
             todo.text = newText;
             this.saveTodos();
@@ -299,7 +251,7 @@
         }
 
         toggleTodo(id) {
-          const todo = this.todos.find(t => t.id === id);
+          const todo = this.todos.find((t) => t.id === id);
           if (todo) {
             todo.completed = !todo.completed;
             todo.completedAt = todo.completed ? new Date().toISOString() : null;
@@ -309,29 +261,29 @@
         }
 
         deleteTodo(id) {
-          this.todos = this.todos.filter(t => t.id !== id);
+          this.todos = this.todos.filter((t) => t.id !== id);
           this.saveTodos();
           this.render();
         }
 
         editTodo(id) {
-          const todo = this.todos.find(t => t.id === id);
+          const todo = this.todos.find((t) => t.id === id);
           if (todo) {
             this.editingId = id;
-            document.getElementById('todoInput').value = todo.text;
-            document.getElementById('submitText').textContent = 'Update';
-            document.getElementById('submitBtn').className = 'btn btn-info px-4';
-            document.querySelector(`[data-id="${id}"]`).classList.add('edit-mode');
+            document.getElementById("todoInput").value = todo.text;
+            document.getElementById("submitText").textContent = "Update";
+            document.getElementById("submitBtn").className = "btn btn-info px-4";
+            document.querySelector(`[data-id="${id}"]`).classList.add("border-warning");
           }
         }
 
         cancelEdit() {
           this.editingId = null;
-          document.getElementById('todoInput').value = '';
-          document.getElementById('submitText').textContent = 'Tambah';
-          document.getElementById('submitBtn').className = 'btn btn-success px-4';
-          document.querySelectorAll('.edit-mode').forEach(el => {
-            el.classList.remove('edit-mode');
+          document.getElementById("todoInput").value = "";
+          document.getElementById("submitText").textContent = "Tambah";
+          document.getElementById("submitBtn").className = "btn btn-primary px-4";
+          document.querySelectorAll(".border-warning").forEach((el) => {
+            el.classList.remove("border-warning");
           });
         }
 
@@ -339,8 +291,6 @@
           const filteredTodos = this.getFilteredTodos();
           const [movedTodo] = filteredTodos.splice(oldIndex, 1);
           filteredTodos.splice(newIndex, 0, movedTodo);
-          
-          // Update the main todos array
           this.todos = filteredTodos;
           this.saveTodos();
           this.render();
@@ -348,53 +298,35 @@
 
         getFilteredTodos() {
           let filtered = [...this.todos];
-
-          // Apply filter
           switch (this.currentFilter) {
-            case 'active':
-              filtered = filtered.filter(todo => !todo.completed);
+            case "active":
+              filtered = filtered.filter((todo) => !todo.completed);
               break;
-            case 'completed':
-              filtered = filtered.filter(todo => todo.completed);
+            case "completed":
+              filtered = filtered.filter((todo) => todo.completed);
               break;
           }
-
-          // Apply search
           if (this.currentSearch) {
-            filtered = filtered.filter(todo =>
+            filtered = filtered.filter((todo) =>
               todo.text.toLowerCase().includes(this.currentSearch.toLowerCase())
             );
           }
-
           return filtered;
         }
 
-        updateStats() {
-          // Stats removed as per request
-        }
-
         render() {
-          const todoList = document.getElementById('todoList');
-          const emptyState = document.getElementById('emptyState');
+          const todoList = document.getElementById("todoList");
+          const emptyState = document.getElementById("emptyState");
           const filteredTodos = this.getFilteredTodos();
-
-          // Update stats
-          this.updateStats();
-
-          // Clear list
-          todoList.innerHTML = '';
-
+          todoList.innerHTML = "";
           if (filteredTodos.length === 0) {
             todoList.appendChild(emptyState.cloneNode(true));
             return;
           }
-
-          filteredTodos.forEach(todo => {
+          filteredTodos.forEach((todo) => {
             const li = this.createTodoElement(todo);
             todoList.appendChild(li);
           });
-
-          // Re-initialize sortable after rendering
           if (this.sortable) {
             this.sortable.destroy();
           }
@@ -402,60 +334,44 @@
         }
 
         createTodoElement(todo) {
-          const li = document.createElement('li');
-          li.className = 'list-group-item todo-item d-flex align-items-center mb-2 rounded border-start border-4 border-primary bg-white shadow-sm';
-          li.setAttribute('data-id', todo.id);
-
+          const li = document.createElement("li");
+          li.setAttribute("data-id", todo.id);
+          const borderClass = todo.completed
+            ? "border-success bg-white"
+            : "border-warning bg-white";
           li.innerHTML = `
-            <div class="drag-handle me-3 text-primary">
-              <i class="bi bi-grip-vertical fs-4"></i>
-            </div>
-            <div class="form-check flex-grow-1">
-              <input 
-                class="form-check-input" 
-                type="checkbox" 
-                ${todo.completed ? 'checked' : ''}
-                onchange="todoApp.toggleTodo(${todo.id})"
-              >
-              <label class="form-check-label ${todo.completed ? 'completed-todo' : ''} fs-5 fw-medium">
-                ${todo.text}
-              </label>
-            </div>
-            <div class="btn-group">
-              ${!todo.completed ? `
-                <button 
-                  class="btn btn-warning text-white fw-bold"
-                  onclick="todoApp.toggleTodo(${todo.id})"
-                  title="Tandai Selesai"
-                >
-                  Belum Selesai
-                </button>
-              ` : `
-                <button 
-                  class="btn btn-success fw-bold"
-                  onclick="todoApp.toggleTodo(${todo.id})"
-                  title="Tandai Belum Selesai"
-                >
-                  Selesai
-                </button>
-              `}
-              <button 
-                class="btn btn-info text-white"
-                onclick="todoApp.editTodo(${todo.id})"
-                title="Edit"
-              >
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button 
-                class="btn btn-danger"
-                onclick="todoApp.showDeleteConfirm(${todo.id})"
-                title="Hapus"
-              >
-                <i class="bi bi-trash3"></i>
-              </button>
+            <div class="card mb-2 shadow-sm border-start border-5 ${borderClass}">
+              <div class="card-body d-flex align-items-center">
+                <div class="drag-handle me-3 text-muted">
+                  <i class="bi bi-grip-vertical fs-4"></i>
+                </div>
+                <div class="form-check flex-grow-1">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    ${todo.completed ? "checked" : ""}
+                    onchange="todoApp.toggleTodo(${todo.id})"
+                  >
+                  <label class="form-check-label ${
+                    todo.completed
+                      ? "text-decoration-line-through text-muted"
+                      : "fw-semibold"
+                  } fs-5">
+                    ${todo.text}
+                  </label>
+                </div>
+                <div class="btn-group">
+                  ${
+                    !todo.completed
+                      ? `<button class="btn btn-warning btn-sm text-white fw-bold" onclick="todoApp.toggleTodo(${todo.id})">Belum Selesai</button>`
+                      : `<button class="btn btn-success btn-sm fw-bold" onclick="todoApp.toggleTodo(${todo.id})">Selesai</button>`
+                  }
+                  <button class="btn btn-info btn-sm text-white" onclick="todoApp.editTodo(${todo.id})"><i class="bi bi-pencil-square"></i></button>
+                  <button class="btn btn-danger btn-sm" onclick="todoApp.showDeleteConfirm(${todo.id})"><i class="bi bi-trash3"></i></button>
+                </div>
+              </div>
             </div>
           `;
-
           return li;
         }
 
@@ -465,11 +381,8 @@
         }
       }
 
-      // Initialize app
       const todoApp = new TodoApp();
-
-      // Handle page unload
-      window.addEventListener('beforeunload', () => {
+      window.addEventListener("beforeunload", () => {
         todoApp.saveTodos();
       });
     </script>
